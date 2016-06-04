@@ -52,8 +52,7 @@ echo "En cours de surveillance... limite temps restant = $limite"
 while true
 do
 	#Sélection des UT sur le point de se terminer
-	#boinccmd --get_tasks | grep -n -B 19 "estimated CPU time remaining: [1][0-6][0-9][0-9]\." | grep -B 11 -A 8 "suspended via GUI: no" | grep -B 2 "$url_prj" | grep "   name: " | cut -d " " -f5 > /tmp/tasklist
-	boinccmd --get_tasks | grep -n -B 19 -E "estimated CPU time remaining: $form\." | grep -B 11 -A 8 "suspended via GUI: no" | grep -B 2 "$url_prj" | grep "   name: " | cut -d " " -f5 > /tmp/tasklist
+	boinccmd --get_tasks | grep -n -B 19 -E "$form\." | grep -B 11 -A 8 "suspended via GUI: no" | grep -B 2 "$url_prj" | grep "   name: " | cut -d " " -f5 > /tmp/tasklist
 
 	#Suspensions
 	while read ligne
