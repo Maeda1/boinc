@@ -1,0 +1,67 @@
+#!/bin/bash
+#Création le 08/05/2015 -- https://github.com/Maeda1/boinc
+
+#But : suspend les UT d'un projet au choix qui sont sur le point de se terminer
+
+#A CHANGER : dossier de travail de Boinc
+boincdos="/media/Calculs/boinc"
+
+#initialisation
+ok=0
+
+#Choix projet
+while [ "$ok" != "OK" ]
+do
+	echo "> Choix du projet cible <"
+	boinccmd --get_project_status | grep -A 1 "\-----------" | more
+	echo "> Entrer le choix voulu par le nombre correspondant < (0=quitter)"
+	read chx_prj
+	if [ $chx_prj = 0 ];then
+		exit
+	fi
+	if [ "$(boinccmd --get_project_status | grep -A 1 "$chx_prj) ")" = "" ];then
+		echo "Erreur de saisie, ce choix n'existe pas"
+		sleep 2
+	else
+		echo "============="
+		echo "Votre choix :"
+		echo "$(boinccmd --get_project_status | grep -A 1 "$chx_prj) ")"
+		url_prj="$(boinccmd --get_project_status | grep -A 2 "$chx_prj) " | grep URL | cut -d " " -f6)"
+		echo "============="
+		echo "Est-ce OK pour démarrer ? (taper OK)"
+		read ok
+	fi
+done
+#Seuil de suspension limite en fonction du temps restant en fonction des projets
+#Chaine commune à tous
+chcom="estimated CPU time remaining: "
+case "$url_prj" in
+	http://pogs.theskynet.org/pogs/)
+        	limite="1699s"
+		form="$chcom[1][0-6][0-9][0-9]\.|$chcom[0-9][0-9][0-9]\.|$chcom[0-9][0-9]\.|$chcom[0-9]\." ;;
+	http://www.worldcommunitygrid.org/)
+        	limite="59s"
+	        form="$chcom[0-5][0-9]\.|$chcom[0-9]\." ;;
+	*)
+		limite="299s"
+                form="$chcom[0-2][0-9][0-9]\.|$chcom[0-9][0-9]\.|$chcom[0-9]\." ;;
+esac
+
+#Traitements
+echo "En cours de surveillance... limite temps restant = $limite"
+while true
+do
+	#Sélection des UT sur le point de se terminer
+	#boinccmd --get_tasks | grep -n -B 19 "estimated CPU time remaining: [1][0-6][0-9][0-9]\." | grep -B 11 -A 8 "suspended via GUI: no" | grep -B 2 "$url_prj" | grep "   name: " | cut -d " " -f5 > /tmp/tasklist
+	boinccmd --get_tasks | grep -n -B 19 -E "estimated CPU time remaining: $form\." | grep -B 11 -A 8 "suspended via GUI: no" | grep -B 2 "$url_prj" | grep "   name: " | cut -d " " -f5 > /tmp/tasklist
+
+	#Suspensions
+	while read ligne
+	do
+		echo "[`date "+%d%m%y %H:%M:%S"`] Suspension de : $ligne"
+		cd $boincdos
+		boinccmd --task "$url_prj" $ligne suspend
+	done < "/tmp/tasklist"
+	sleep 5
+done
+

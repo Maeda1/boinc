@@ -1,0 +1,58 @@
+#!/bin/bash
+#Création le 08/05/2015 -- https://github.com/Maeda1/boinc
+
+#But : reprend les UT d'un projet au choix qui sont en attente pour les finir
+
+#A CHANGER : dossier de travail de Boinc
+boincdos="/media/Calculs/boinc"
+
+#initialisation
+ok=0
+
+#Choix projet
+while [ "$ok" != "OK" ]
+do
+	echo "> Choix du projet cible <"
+	boinccmd --get_project_status | grep -A 1 "\-----------" | more
+	echo "> Entrer le choix voulu par le nombre correspondant < (0=quitter)"
+	read chx_prj
+	if [ $chx_prj = 0 ];then
+		exit
+	fi
+	if [ "$(boinccmd --get_project_status | grep -A 1 "$chx_prj) ")" = "" ];then
+		echo "Erreur de saisie, ce choix n'existe pas"
+		sleep 2
+	else
+		echo "> Heure exacte à laquelle reprendre les calculs < /!\ format = mm/jj/aaaa hh:mm"
+		read hms
+		echo "============="
+		echo "Votre choix :"
+		echo " $(boinccmd --get_project_status | grep -A 1 "$chx_prj) ")"
+		echo "-> REPRISE des calculs = $hms"
+		echo "============="
+		url_prj="$(boinccmd --get_project_status | grep -A 2 "$chx_prj) " | grep URL | cut -d " " -f6)"
+		echo "Est-ce OK ? (taper OK)"
+		read ok
+	fi
+done
+
+#Attente avant Heure H
+debut=$(date +%s)
+fin=$(date -d "$hms" +%s)
+attente=$(($fin-$debut))
+sleep $attente
+
+#Traitements
+echo "Reprise des calculs..."
+
+#Sélection des UT suspendues
+boinccmd --get_tasks | grep -B 11 -A 8 "suspended via GUI: yes" | grep -B 2 "$url_prj" | grep "   name: " | cut -d " " -f5 > /tmp/tasklist
+#Reprise des calculs
+while read ligne
+do
+	echo "[`date "+%d%m%y %H:%M:%S"`] Reprise de : $ligne"
+	cd $boincdos
+	boinccmd --task "$url_prj" $ligne resume
+done < "/tmp/tasklist"
+exit
+
