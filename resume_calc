@@ -33,6 +33,19 @@ do
 		url_prj="$(boinccmd --get_project_status | grep -A 2 "$chx_prj) " | grep URL | cut -d " " -f6)"
 		echo "Est-ce OK ? (taper OK)"
 		read ok
+		if [ "$(ps -eo pid,comm | grep suspend_calc)" ];then
+			echo "== Script suspend_calc détecté =="
+			echo "$(ps -eo pid,comm,lstart| grep suspend_calc)"
+			echo "Entrer le nombre correspondant pour tuer le processus à l'heure définie : (taper 0 pour ne rien tuer et continuer)"
+			read killsusp
+			testpid="$(ps -eo pid,comm | grep suspend_calc | tr -d [:alpha:] | tr -d " "| grep -E "^$killsusp\_$")"
+			if [ ! "$testpid" -a $killsusp -ne 0 ];then
+				echo "Nombre inexistant, mauvaise saisie, on repart du début"
+				ok="NOK"
+				unset killsusp
+				sleep 3
+			fi
+		fi
 	fi
 done
 
@@ -40,9 +53,23 @@ done
 debut=$(date +%s)
 fin=$(date -d "$hms" +%s)
 attente=$(($fin-$debut))
+echo "`date` => Attente de : $attente secondes"
 sleep $attente
 
 #Traitements
+if [ -v killsusp -a $killsusp -ne 0 ];then
+	echo "On tue le suspend_calc demandé"
+	kill $killsusp
+	sleep 3
+	if [ "$(ps -eo pid,comm | grep $killsusp)" ];then
+		kill -9 $killsusp
+		sleep 3
+	fi
+	if [ "$(ps -eo pid,comm | grep $killsusp)" ];then
+		echo "! Problème pour tuer le suspend_calc !"
+		exit 1
+	fi
+fi
 echo "Reprise des calculs..."
 
 #Sélection des UT suspendues
