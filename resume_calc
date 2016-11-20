@@ -23,7 +23,7 @@ do
 		echo "Erreur de saisie, ce choix n'existe pas"
 		sleep 2
 	else
-		echo "> Heure exacte à laquelle reprendre les calculs < /!\ format = mm/jj/aaaa hh:mm"
+		echo "> Heure exacte à laquelle reprendre les calculs [taper ENTREE pour action immédiate] < /!\ format = mm/jj/aaaa hh:mm"
 		read hms
 		echo "============="
 		echo "Votre choix :"
@@ -36,11 +36,11 @@ do
 		if [ "$(ps -eo pid,comm | grep suspend_calc)" ];then
 			echo "== Script suspend_calc détecté =="
 			echo "$(ps -eo pid,comm,lstart| grep suspend_calc)"
-			echo "Entrer le nombre correspondant pour tuer le processus à l'heure définie : (taper 0 pour ne rien tuer et continuer)"
+			echo "Entrer le nombre correspondant pour tuer le processus à l'heure définie : (taper ENTREE pour ne rien tuer et continuer)"
 			read killsusp
-			testpid="$(ps -eo pid,comm | grep suspend_calc | tr -d [:alpha:] | tr -d " "| grep -E "^$killsusp\_$")"
-			if [ ! "$testpid" -a $killsusp -ne 0 ];then
-				echo "Nombre inexistant, mauvaise saisie, on repart du début"
+			testpid="$(ps -eo pid,comm | grep suspend_calc | tr -d [:alpha:] | tr -d " "| tr -d "_" | grep -E "^$killsusp\$")"
+			if [ -z "$testpid" -a ! -z "$killsusp" ];then
+				echo "Problème avec le PID : mauvaise saisie, on repart du début"
 				ok="NOK"
 				unset killsusp
 				sleep 3
@@ -50,14 +50,15 @@ do
 done
 
 #Attente avant Heure H
-debut=$(date +%s)
-fin=$(date -d "$hms" +%s)
-attente=$(($fin-$debut))
-echo "`date` => Attente de : $attente secondes"
-sleep $attente
-
+if [ ! -z "$hms" ];then
+	debut=$(date +%s)
+	fin=$(date -d "$hms" +%s)
+	attente=$(($fin-$debut))
+	echo "`date` => Attente de : $attente secondes"
+	sleep $attente
+fi
 #Traitements
-if [ -v killsusp -a $killsusp -ne 0 ];then
+if [ ! -z "$testpid" ];then
 	echo "On tue le suspend_calc demandé"
 	kill $killsusp
 	sleep 3
@@ -81,5 +82,6 @@ do
 	cd $boincdos
 	boinccmd --task "$url_prj" $ligne resume
 done < "/tmp/tasklist"
-exit
+echo "Fin script"
+exit 0
 
