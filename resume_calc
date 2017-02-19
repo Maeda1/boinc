@@ -19,7 +19,7 @@ do
 	if [ $chx_prj = 0 ];then
 		exit
 	fi
-	if [ "$(boinccmd --get_project_status | grep -A 1 "$chx_prj) ")" = "" ];then
+	if [ "$(boinccmd --get_project_status | grep -A 1 "^$chx_prj) ")" = "" ];then
 		echo "Erreur de saisie, ce choix n'existe pas"
 		sleep 2
 	else
@@ -27,10 +27,10 @@ do
 		read hms
 		echo "============="
 		echo "Votre choix :"
-		echo " $(boinccmd --get_project_status | grep -A 1 "$chx_prj) ")"
+		echo " $(boinccmd --get_project_status | grep -A 1 "^$chx_prj) ")"
 		echo "-> REPRISE des calculs = $hms"
 		echo "============="
-		url_prj="$(boinccmd --get_project_status | grep -A 2 "$chx_prj) " | grep URL | cut -d " " -f6)"
+		url_prj="$(boinccmd --get_project_status | grep -A 2 "^$chx_prj) " | grep URL | cut -d " " -f6)"
 		echo "Est-ce OK ? (taper OK)"
 		read ok
 		if [ "$(ps -eo pid,comm | grep suspend_calc)" ];then

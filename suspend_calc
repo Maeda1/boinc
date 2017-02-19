@@ -19,13 +19,13 @@ do
 	if [ $chx_prj = 0 ];then
 		exit
 	fi
-	if [ "$(boinccmd --get_project_status | grep -A 1 "$chx_prj) ")" = "" ];then
+	if [ "$(boinccmd --get_project_status | grep -A 1 "^$chx_prj) ")" = "" ];then
 		echo "Erreur de saisie, ce choix n'existe pas"
 		sleep 2
 	else
 		echo "============="
 		echo "Votre choix :"
-		echo "$(boinccmd --get_project_status | grep -A 1 "$chx_prj) ")"
+		echo "$(boinccmd --get_project_status | grep -A 1 "^$chx_prj) ")"
 		url_prj="$(boinccmd --get_project_status | grep -A 2 "$chx_prj) " | grep URL | cut -d " " -f6)"
 		echo "============="
 		echo "Est-ce OK pour démarrer ? (taper OK)"
@@ -39,12 +39,21 @@ case "$url_prj" in
 	http://pogs.theskynet.org/pogs/)
         	limite="1699s"
 		form="$chcom[1][0-6][0-9][0-9]\.|$chcom[0-9][0-9][0-9]\.|$chcom[0-9][0-9]\.|$chcom[0-9]\." ;;
+	http://boinc.bakerlab.org/rosetta/)
+        	limite="15599s"
+		form="$chcom[1][0-5][0-5][0-9][0-9]\.|$chcom[0-9][0-9][0-9][0-9]\.|$chcom[0-9][0-9][0-9]\.|$chcom[0-9][0-9]\.|$chcom[0-9]\." ;;
+	http://boinc.fzk.de/poem/)
+        	limite="369s"
+		form="$chcom[0-3][0-6][0-9]\.|$chcom[0-9][0-9]\.|$chcom[0-9]\." ;;
 	http://www.worldcommunitygrid.org/)
         	limite="59s"
 	        form="$chcom[0-5][0-9]\.|$chcom[0-9]\." ;;
+#	http://universeathome.pl/universe/)
+#        	limite="1699s"
+#		form="$chcom[1][0-6][0-9][0-9]\.|$chcom[0-9][0-9][0-9]\.|$chcom[0-9][0-9]\.|$chcom[0-9]\." ;;
 	*)
-		limite="299s"
-                form="$chcom[0-2][0-9][0-9]\.|$chcom[0-9][0-9]\.|$chcom[0-9]\." ;;
+		limite="99s"
+                form="$chcom[0-9][0-9]\.|$chcom[0-9]\." ;;
 esac
 
 #Traitements
