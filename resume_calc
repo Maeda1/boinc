@@ -38,7 +38,7 @@ do
 			echo "$(ps -eo pid,comm,lstart| grep suspend_calc)"
 			echo "Entrer le nombre correspondant pour tuer le processus à l'heure définie : (taper ENTREE pour ne rien tuer et continuer)"
 			read killsusp
-			testpid="$(ps -eo pid,comm | grep suspend_calc | tr -d [:alpha:] | tr -d " "| tr -d "_" | grep -E "^$killsusp\$")"
+			testpid="$(pgrep suspend_ | grep -Fx $killsusp)"
 			if [ -z "$testpid" -a ! -z "$killsusp" ];then
 				echo "Problème avec le PID : mauvaise saisie, on repart du début"
 				ok="NOK"
