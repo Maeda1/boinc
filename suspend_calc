@@ -26,7 +26,7 @@ do
 		echo "============="
 		echo "Votre choix :"
 		echo "$(boinccmd --get_project_status | grep -A 1 "^$chx_prj) ")"
-		url_prj="$(boinccmd --get_project_status | grep -A 2 "$chx_prj) " | grep URL | cut -d " " -f6)"
+		url_prj="$(boinccmd --get_project_status | grep -A 2 "^$chx_prj) " | grep URL | cut -d " " -f6)"
 		echo "============="
 		echo "Est-ce OK pour démarrer ? (taper OK)"
 		read ok
