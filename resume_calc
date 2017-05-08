@@ -35,7 +35,7 @@ do
 		read ok
 		if [ "$(ps -eo pid,comm | grep suspend_calc)" ];then
 			echo "== Script suspend_calc détecté =="
-			echo "$(ps -eo pid,comm,lstart| grep suspend_calc)"
+			echo "$(ps -h| grep "[s]uspend_")"
 			echo "Entrer le nombre correspondant pour tuer le processus à l'heure définie : (taper ENTREE pour ne rien tuer et continuer)"
 			read killsusp
 			testpid="$(pgrep suspend_ | grep -Fx $killsusp)"
