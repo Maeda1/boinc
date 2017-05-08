@@ -112,6 +112,6 @@ do
 		fi
 	counter=$((counter+1))
 	done
-	sleep 5
+	sleep 2
 done
 
