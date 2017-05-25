@@ -29,32 +29,43 @@ if [ ! -f "$mydir/suspend_calc_conf" ];then
 	echo "INFO : Fichier suspend_calc_conf créé au même niveau que suspend_calc. Configuration par défaut : 60 secondes. Modifiez-le pour y mettre vos préférences."
 fi
 
-#Choix projet
-while [ "$ok" != "OK" ]
+#Recherche d'un argument précisant déjà l'URL du projet, si trouvé = pas de question posée
+for arg in "$@"
 do
-	echo "> Choix du projet cible <"
-	boinccmd --get_project_status | grep -A 1 "\-----------" | more
-	echo "> Entrer le choix voulu par le nombre correspondant < (0=quitter)"
-	read chx_prj
-	if [ $chx_prj = 0 ];then
-		exit
-	fi
-	if [ "$(boinccmd --get_project_status | grep -A 1 "^$chx_prj) ")" = "" ];then
-		echo "Erreur de saisie, ce choix n'existe pas"
-		sleep 2
-	else
-		echo "============="
-		echo "Votre choix :"
-		echo "$(boinccmd --get_project_status | grep -A 1 "^$chx_prj) ")"
-		url_prj="$(boinccmd --get_project_status | grep -A 2 "^$chx_prj) " | grep URL | cut -d " " -f6)"
-		echo "============="
-		echo "Est-ce OK pour démarrer ? (taper OK)"
-		read ok
-	fi
+        if [ "$(echo $arg | grep "^http")" ];then
+                url_prj="$arg"
+		break
+        fi
 done
 
+#Choix projet
+if [ -z $url_prj ];then
+	while [ "$ok" != "OK" ]
+	do
+		echo "> Choix du projet cible <"
+		boinccmd --get_project_status | grep -A 1 "\-----------" | more
+		echo "> Entrer le choix voulu par le nombre correspondant < (0=quitter)"
+		read chx_prj
+		if [ $chx_prj = 0 ];then
+			exit
+		fi
+		if [ "$(boinccmd --get_project_status | grep -A 1 "^$chx_prj) ")" = "" ];then
+			echo "Erreur de saisie, ce choix n'existe pas"
+			sleep 2
+		else
+			echo "============="
+			echo "Votre choix :"
+			echo "$(boinccmd --get_project_status | grep -A 1 "^$chx_prj) ")"
+			url_prj="$(boinccmd --get_project_status | grep -A 2 "^$chx_prj) " | grep URL | cut -d " " -f6)"
+			echo "============="
+			echo "Est-ce OK pour démarrer ? (taper OK)"
+			read ok
+		fi
+	done
+fi
+
 #Récupération temps limite du fichier préférences CONF
-limite=$(grep "$url_prj" "$mydir/suspend_calc_conf" | cut -d ";" -f2)
+limite=$(grep -m1 "^$url_prj" "$mydir/suspend_calc_conf" | cut -d ";" -f2)
 if [ -z $limite ];then
 	limite=$(grep "default" "$mydir/suspend_calc_conf" | cut -d ";" -f2)
 	echo "Pas de préférences trouvées : limite mise à $limite"

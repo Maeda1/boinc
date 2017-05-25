@@ -13,6 +13,7 @@ Pour les deux scripts : vous devez modifier la ligne au début boincdos pour y i
 
 N.B : Pensez que vous devez désuspendre les UT suspendues sinon votre client Boinc ne voudra pas télécharger de nouvelle UT. De même, vous devez (avant demande de nouvelle UT) ajuster vos valeurs de cache de travail. Faites attention à avoir de la marge au niveau des UT en attente dans votre cache, qu'il ne soit pas vide.
 
+*suspend_calc -> Pour une utilisation silencieuse (pas d'interactions utilisateur, pas de question) : mettez l'URL du projet que vous voulez vérifier en argument.*
 
 US/EN :
 
@@ -27,3 +28,5 @@ For both : you need to edit each script and change the boincdos variable to put 
 *Tips : you can execute in parallel those scripts, each for WUs of one project*
 
 N.B : Be aware that your Boinc client won't download any new WU if some are suspended, think that you have to resume them before asking new WU (and you need to increase your cache value accordingly). Think to take more WU in your cache, do not let it empty.
+
+*suspend_calc -> For a headless use (no user interaction, no question) : just put the project URL you want to check in argument.*
