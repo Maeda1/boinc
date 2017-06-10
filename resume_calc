@@ -8,6 +8,29 @@ boincdos="/media/Calculs/boinc"
 
 #initialisation
 ok=0
+count_arg=1
+
+#Recherche d'un argument précisant déjà l'URL du projet, si trouvé = pas de question posée
+for arg in "$@"
+do
+	if [ "$(echo $arg | grep "^http")" ];then
+		url_prj="$arg"  	     
+	elif [ "$(echo `date -d "$arg"`)" ];then
+		hms="$arg"
+	fi
+	let "count_arg++"
+	if [ $count_arg -gt 2 ];then
+		break
+	fi
+done
+
+#Vérification si on peut bypasser les questions grâce aux arguments
+echo "$url_prj"
+echo "$hms"
+if [ ! -z "$hms" -a ! -z "$url_prj" ];then
+	ok="OK"
+	echo "$ok"
+fi
 
 #Choix projet
 while [ "$ok" != "OK" ]
