@@ -14,7 +14,9 @@ Pour les deux scripts : vous devez modifier la ligne au début boincdos pour y i
 N.B : Pensez que vous devez désuspendre les UT suspendues sinon votre client Boinc ne voudra pas télécharger de nouvelle UT. De même, vous devez (avant demande de nouvelle UT) ajuster vos valeurs de cache de travail. Faites attention à avoir de la marge au niveau des UT en attente dans votre cache, qu'il ne soit pas vide.
 
 Ligne de commande pour un lancement sans interaction utilisateur :
+
 suspend_calc url_du_projet
+
 resume_calc url_projet "mm/jj/aaaa hh:mm"
 
 *La date a juste besoin d'etre reconnue par le système, donc prendre le format qui convient*
@@ -34,7 +36,9 @@ For both : you need to edit each script and change the boincdos variable to put 
 N.B : Be aware that your Boinc client won't download any new WU if some are suspended, think that you have to resume them before asking new WU (and you need to increase your cache value accordingly). Think to take more WU in your cache, do not let it empty.
 
 Command line argument to get a quiet script :
+
 suspend_calc project_url
+
 resume_calc project_url "mm/dd/yyyy hh:mm"
 
 *Date have to be interpreted by your system, then write a valid syntax*
