@@ -14,12 +14,15 @@ count_arg=1
 for arg in "$@"
 do
 	if [ "$(echo $arg | grep "^http")" ];then
-		url_prj="$arg"  	     
+		url_prj="$arg"
 	elif [ "$(echo `date -d "$arg"`)" ];then
 		hms="$arg"
+	elif [ "$arg" -gt 1 -a "$arg" -le 32768 ];then
+		testpid="OK"
+		killsusp="$arg"
 	fi
 	let "count_arg++"
-	if [ $count_arg -gt 2 ];then
+	if [ $count_arg -gt 3 ];then
 		break
 	fi
 done
@@ -27,9 +30,13 @@ done
 #Vérification si on peut bypasser les questions grâce aux arguments
 echo "$url_prj"
 echo "$hms"
+echo "$killsusp"
 if [ ! -z "$hms" -a ! -z "$url_prj" ];then
 	ok="OK"
 	echo "$ok"
+fi
+if [ -z "$killsusp" ];then
+	echo "-> Pas de PID, on ne tuera pas de suspend_calc !"
 fi
 
 #Choix projet
