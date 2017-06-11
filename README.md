@@ -17,7 +17,7 @@ Ligne de commande pour un lancement sans interaction utilisateur :
 
 suspend_calc url_du_projet
 
-resume_calc url_projet "mm/jj/aaaa hh:mm"
+resume_calc url_projet "mm/jj/aaaa hh:mm" *[PID_de_suspend_calc]*
 
 *La date a juste besoin d'etre reconnue par le système, donc prendre le format qui convient*
 
@@ -39,6 +39,6 @@ Command line argument to get a quiet script :
 
 suspend_calc project_url
 
-resume_calc project_url "mm/dd/yyyy hh:mm"
+resume_calc project_url "mm/dd/yyyy hh:mm" *[suspend_calc_PID]*
 
 *Date have to be interpreted by your system, then write a valid syntax*
