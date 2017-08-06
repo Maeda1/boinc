@@ -1,4 +1,6 @@
 # VERSION 1.0
+US : please see at the bottom
+
 ## FR :
 
 ### But
@@ -38,7 +40,7 @@ resume_calc url_projet "mm/jj/aaaa hh:mm" PID_de_suspend_calc
 
 ## US/EN :
 
-### But
+### Goal 
 Script for Linux in Bash for boinc to schedule tasks (in french for now, please feel free to ask if you need that the output of script texts needs to be translated)
 
 ### suspend_calc
@@ -58,7 +60,7 @@ N.B : Be aware that your Boinc client won't download any new WU if some are susp
 
 At the very first suspend_calc start, the script checks and create (if it doesn't exists) a configuration file next to the script, containing a default limits for all projects set to 60 seconds. Feel free to add your project's URL and limits.
 
-#### Exemple de fichier suspend_calc_conf :
+#### suspend_calc_conf example :
 ```
 #project;limit
 default;60
