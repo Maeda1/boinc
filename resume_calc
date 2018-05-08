@@ -104,7 +104,7 @@ fi
 echo "Reprise des calculs..."
 
 #Sélection des UT suspendues
-boinccmd --get_tasks | grep -B 11 -A 8 "suspended via GUI: yes" | grep -B 2 "$url_prj" | grep "   name: " | cut -d " " -f5 > /tmp/tasklist
+boinccmd --get_tasks | grep -B 12 -A 8 "suspended via GUI: yes" | grep -B 2 "$url_prj" | grep "   name: " | cut -d " " -f5 > /tmp/tasklist
 #Reprise des calculs
 while read ligne
 do
