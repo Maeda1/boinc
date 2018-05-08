@@ -3,7 +3,7 @@ US : please see at the bottom
 
 ## FR :
 
-NOTE : VERSION ALPHA, encore non fonctionnelle. Est vouée à être utilisée avec les dernières versions de Boinc client, qui ont changé le nom des champs principaux sur lequel ce script se base.
+NOTE : VERSION ALPHA, fonctionnelle mais à tester plus longtemps. La détection de l'approche de la fin d'une unité de travail est maintenant basé sur la portion effectuée 'fraction done'.
 
 ### But
 Script pour Linux en Bash pour automatiser (planifier) des actions sur boinc
