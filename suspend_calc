@@ -19,15 +19,15 @@ if [ ! -d "$boincdos" ];then
 	exit 1
 fi
 
-testcmd=($(boinccmd --get_tasks | grep -e "fraction done:"  | grep -m 1 -o '[0-9]*\.[0-9]*'))
+testcmd=($(boinccmd --get_tasks | grep -B 12 -A 8 "suspended via GUI: no" | grep -e "fraction done:"  | grep -m 1 -o '[0-9]*\.[0-9]*'))
 if [ -z $testcmd ];then
 	echo "Problème avec la commande de vérification de la progression des tâches, si vous utilisez un client Boinc ancien, essayez la version v1.0 de suspend_calc ou mettez à jour Boinc"
 	exit 2
 fi
 
-testcmd=($(boinccmd --get_tasks | grep -m 1 "   WU name: " | cut -d " " -f6))
+testcmd=($(boinccmd --get_tasks | grep -B 12 -A 8 "suspended via GUI: no" | grep -m 1 "   name: " | cut -d " " -f5))
 if [ -z $testcmd ];then
-	echo "Problème avec la commande de vérification de la progression des tâches, si vous utilisez un client Boinc ancien, essayez la version v1.0 de suspend_calc ou mettez à jour Boinc"
+	echo "Problème avec la commande de vérification du nom des tâches, si vous utilisez un client Boinc ancien, essayez la version v1.0 de suspend_calc ou mettez à jour Boinc"
 	exit 3
 fi
 if [ -z $testcmd ];then
@@ -87,7 +87,7 @@ fi
 
 #Récupération temps limite du fichier préférences CONF
 limite=$(grep -m1 "^$url_prj" "$mydir/suspend_calc_conf" | cut -d ";" -f2)
-if [ -z $limite -o "$(echo $limite | grep "0.")" == "" ];then
+if [ "$(echo $limite | grep "0.")" == "" ];then
 	limite=$(grep "default" "$mydir/suspend_calc_conf" | cut -d ";" -f2)
 	echo "Pas de préférences trouvées : limite mise à $limite"
 else
@@ -99,14 +99,14 @@ echo "Vérification des UT en cours... limite temps restant = $limite"
 while true
 do
 	#Sélection des UT sur le point de se terminer
-	list_done=($(boinccmd --get_tasks | grep -B 11 -A 8 "suspended via GUI: no" | grep -B 2 -A 17 "$url_prj" | grep -e "fraction done:"  | grep -o '[0-9]*\.[0-9]*'))
-	list_wu=($(boinccmd --get_tasks | grep -B 11 -A 8 "suspended via GUI: no" | grep -B 2 -A 17 "$url_prj" | grep "   WU name: " | cut -d " " -f6))	
+	list_done=($(boinccmd --get_tasks | grep -B 12 -A 8 "suspended via GUI: no" | grep -B 2 -A 18 "$url_prj" | grep -e "fraction done:"  | grep -o '[0-9]*\.[0-9]*'))
+	list_wu=($(boinccmd --get_tasks | grep -B 12 -A 8 "suspended via GUI: no" | grep -B 2 -A 18 "$url_prj" | grep "   name: " | cut -d " " -f5))	
 	counter=0
 	for i in "${list_done[@]}"
 	do
 		#Suspensions
 		if [[ ${list_done[$counter]} > $limite ]];then
-			#echo "${list_done[$counter]} -> ${list_wu[$counter]}"
+			echo "${list_done[$counter]} -> ${list_wu[$counter]} -> limite = $limite"
 			echo "[`date "+%d%m%y %H:%M:%S"`] Suspension de : ${list_wu[$counter]} [Portion effectuée = ${list_done[$counter]}]"
 			cd $boincdos
 			boinccmd --task "$url_prj" ${list_wu[$counter]} suspend
