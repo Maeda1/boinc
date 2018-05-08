@@ -41,13 +41,13 @@ if [ ! -f "$mydir/suspend_calc_conf" ];then
 		echo "Problème à la création du fichier suspend_calc_conf sous $mydir. Merci de le créer et relancer le script"
 		exit 1
 	fi
-	echo "#url projet;temps restants limite en secondes" >> "$mydir/suspend_calc_conf"
-	echo "default;60" >> "$mydir/suspend_calc_conf"
+	echo "#url projet;% réalisé (0.95 = 95%)" >> "$mydir/suspend_calc_conf"
+	echo "default;0.95" >> "$mydir/suspend_calc_conf"
 	if [ $? -ne 0 ];then
 		echo "Problème pour écrire dans le fichier suspend_calc_conf sous $mydir. Merci de corriger, puis supprimer le fichier et relancer le script"
 		exit 1
 	fi
-	echo "INFO : Fichier suspend_calc_conf créé au même niveau que suspend_calc. Configuration par défaut : 60 secondes. Modifiez-le pour y mettre vos préférences."
+	echo "INFO : Fichier suspend_calc_conf créé au même niveau que suspend_calc. Configuration par défaut : 95% (0.95). Modifiez-le pour y mettre vos préférences."
 fi
 
 #Recherche d'un argument précisant déjà l'URL du projet, si trouvé = pas de question posée
@@ -87,61 +87,26 @@ fi
 
 #Récupération temps limite du fichier préférences CONF
 limite=$(grep -m1 "^$url_prj" "$mydir/suspend_calc_conf" | cut -d ";" -f2)
-if [ -z $limite ];then
+if [ -z $limite -o "$(echo $limite | grep "0.")" == "" ];then
 	limite=$(grep "default" "$mydir/suspend_calc_conf" | cut -d ";" -f2)
 	echo "Pas de préférences trouvées : limite mise à $limite"
 else
 	echo "Préférence trouvée : limite mise à $limite"
 fi
 
-#Seuil de suspension limite en fonction du temps restant en fonction des projets
-#Chaine commune à tous
-#chcom="estimated CPU time remaining: "
-#case "$url_prj" in
-#	http://pogs.theskynet.org/pogs/)
-#        	limite="1699s"
-#		form="$chcom[1][0-6][0-9][0-9]\.|$chcom[0-9][0-9][0-9]\.|$chcom[0-9][0-9]\.|$chcom[0-9]\." ;;
-#	http://boinc.bakerlab.org/rosetta/)
-#        	limite="15599s"
-#		form="$chcom[1][0-5][0-5][0-9][0-9]\.|$chcom[0-9][0-9][0-9][0-9]\.|$chcom[0-9][0-9][0-9]\.|$chcom[0-9][0-9]\.|$chcom[0-9]\." ;;
-#	http://boinc.fzk.de/poem/)
-#        	limite="369s"
-#		form="$chcom[0-3][0-6][0-9]\.|$chcom[0-9][0-9]\.|$chcom[0-9]\." ;;
-#	http://www.worldcommunitygrid.org/)
-#        	limite="59s"
-#	        form="$chcom[0-5][0-9]\.|$chcom[0-9]\." ;;
-#	http://www.cosmologyathome.org/)
-#        	limite="1699s"
-#		form="$chcom[1][0-6][0-9][0-9]\.|$chcom[0-9][0-9][0-9]\.|$chcom[0-9][0-9]\.|$chcom[0-9]\." ;;
-#	http://einstein.phys.uwm.edu/)
-#        	limite="669s"
-#		form="$chcom[0-6][0-6][0-9]\.|$chcom[0-9][0-9]\.|$chcom[0-9]\." ;;
-#	http://universeathome.pl/universe/)
-#        	limite="1699s"
-#		form="$chcom[1][0-6][0-9][0-9]\.|$chcom[0-9][0-9][0-9]\.|$chcom[0-9][0-9]\.|$chcom[0-9]\." ;;
-#	*)
-#		limite="99s"
-#                form="$chcom[0-9][0-9]\.|$chcom[0-9]\." ;;
-#esac
-
 #Traitements
-echo "En cours de surveillance... limite temps restant = $limite"
+echo "Vérification des UT en cours... limite temps restant = $limite"
 while true
 do
 	#Sélection des UT sur le point de se terminer
-#	boinccmd --get_tasks | grep -n -B 19 -E "$form\." | grep -B 11 -A 8 "suspended via GUI: no" | grep -B 2 "$url_prj" | grep "   name: " | cut -d " " -f5 > /tmp/tasklist
-	#list_time=($(boinccmd --get_tasks | grep -B 11 -A 8 "suspended via GUI: no" | grep -B 2 -A 17 "$url_prj" | grep -e "estimated" | grep -o '[0-9]*\.' | tr -d "."))
 	list_done=($(boinccmd --get_tasks | grep -B 11 -A 8 "suspended via GUI: no" | grep -B 2 -A 17 "$url_prj" | grep -e "fraction done:"  | grep -o '[0-9]*\.[0-9]*'))
-	#list_wu=($(boinccmd --get_tasks | grep -B 11 -A 8 "suspended via GUI: no" | grep -B 2 -A 17 "$url_prj" | grep "   name: " | cut -d " " -f5))
 	list_wu=($(boinccmd --get_tasks | grep -B 11 -A 8 "suspended via GUI: no" | grep -B 2 -A 17 "$url_prj" | grep "   WU name: " | cut -d " " -f6))	
 	counter=0
 	for i in "${list_done[@]}"
 	do
 		#Suspensions
-#		if [ ${list_time[$counter]} -le $limite ];then
 		if [[ ${list_done[$counter]} > $limite ]];then
 			#echo "${list_done[$counter]} -> ${list_wu[$counter]}"
-#			echo "[`date "+%d%m%y %H:%M:%S"`] Suspension de : ${list_wu[$counter]} [temps restant = ${list_time[$counter]}s]"
 			echo "[`date "+%d%m%y %H:%M:%S"`] Suspension de : ${list_wu[$counter]} [Portion effectuée = ${list_done[$counter]}]"
 			cd $boincdos
 			boinccmd --task "$url_prj" ${list_wu[$counter]} suspend
@@ -150,4 +115,3 @@ do
 	done
 	sleep 2
 done
-
