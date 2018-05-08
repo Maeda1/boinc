@@ -106,7 +106,7 @@ do
 	do
 		#Suspensions
 		if [[ ${list_done[$counter]} > $limite ]];then
-			echo "${list_done[$counter]} -> ${list_wu[$counter]} -> limite = $limite"
+			#echo "${list_done[$counter]} -> ${list_wu[$counter]} -> limite = $limite"
 			echo "[`date "+%d%m%y %H:%M:%S"`] Suspension de : ${list_wu[$counter]} [Portion effectuée = ${list_done[$counter]}]"
 			cd $boincdos
 			boinccmd --task "$url_prj" ${list_wu[$counter]} suspend
