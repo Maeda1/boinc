@@ -1,7 +1,9 @@
-# VERSION 1.0
+# VERSION 1.1-alpha
 US : please see at the bottom
 
 ## FR :
+
+NOTE : VERSION ALPHA, encore non fonctionnelle. Est vouée à être utilisée avec les dernières versions de Boinc client, qui ont changé le nom des champs principaux sur lequel ce script se base.
 
 ### But
 Script pour Linux en Bash pour automatiser (planifier) des actions sur boinc
@@ -21,13 +23,13 @@ N.B : Pensez que vous devez désuspendre les UT suspendues sinon votre client Bo
 
 ### Utilisation :
 
-Au premier lancement, le script vérifie et crée (s'il n'existe pas) un fichier de configuration à coté du script, avec par défaut pour tous projets une limite à 60 secondes. Libre à vous de rajouter vos URL de projet puis vos limites.
+Au premier lancement, le script vérifie et crée (s'il n'existe pas) un fichier de configuration à coté du script, avec par défaut pour tous projets une limite à 95% (0.95). Libre à vous de rajouter vos URL de projet puis vos limites.
 
 #### Exemple de fichier suspend_calc_conf :
 ```
-#url projet;temps restants limite en secondes
-default;60
-http://pogs.theskynet.org/pogs/;1700
+#url projet;% réalisé (0.95 = 95%)
+default;0.95
+http://pogs.theskynet.org/pogs/;0.85
 ```
 
 #### Ligne de commande pour un lancement sans interaction utilisateur :
@@ -39,6 +41,8 @@ resume_calc url_projet "mm/jj/aaaa hh:mm" PID_de_suspend_calc
 *La date a juste besoin d'etre reconnue par le système, donc prendre le format qui convient*
 
 ## US/EN :
+
+NOTE : ALPHA VERSION, not meant to be used in production. Will be used with last Boinc client versions, which have changed their main fields name and this script use them.
 
 ### Goal 
 Script for Linux in Bash for boinc to schedule tasks (in french for now, please feel free to ask if you need that the output of script texts needs to be translated)
@@ -58,13 +62,13 @@ N.B : Be aware that your Boinc client won't download any new WU if some are susp
 
 ### USAGE :
 
-At the very first suspend_calc start, the script checks and create (if it doesn't exists) a configuration file next to the script, containing a default limits for all projects set to 60 seconds. Feel free to add your project's URL and limits.
+At the very first suspend_calc start, the script checks and create (if it doesn't exists) a configuration file next to the script, containing a default limits for all projects set to 95% (0.95). Feel free to add your project's URL and limits.
 
 #### suspend_calc_conf example :
 ```
-#project;limit
-default;60
-http://pogs.theskynet.org/pogs/;1700
+#project;fraction done (0.95 = 95%)
+default;0.95
+http://pogs.theskynet.org/pogs/;0.85
 ```
 #### Command line argument to get a quiet script :
 ```bash
