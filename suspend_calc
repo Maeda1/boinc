@@ -19,13 +19,13 @@ if [ ! -d "$boincdos" ];then
 	exit 1
 fi
 
-testcmd=($(boinccmd --get_tasks | grep -B 12 -A 8 "suspended via GUI: no" | grep -e "fraction done:"  | grep -m 1 -o '[0-9]*\.[0-9]*'))
+testcmd=($(boinccmd --get_tasks | grep -B 12 -A 8 "suspended via GUI: no" | grep '^[[:blank:]]*fraction done:'  | grep -m 1 -o '[0-9]*\.[0-9]*'))
 if [ -z $testcmd ];then
 	echo "Problème avec la commande de vérification de la progression des tâches, si vous utilisez un client Boinc ancien, essayez la version v1.0 de suspend_calc ou mettez à jour Boinc"
 	exit 2
 fi
 
-testcmd=($(boinccmd --get_tasks | grep -B 12 -A 8 "suspended via GUI: no" | grep -m 1 "   name: " | cut -d " " -f5))
+testcmd=($(boinccmd --get_tasks | grep -B 12 -A 8 "suspended via GUI: no" | grep -m 1 '^[[:blank:]]*name:' | cut -d " " -f5))
 if [ -z $testcmd ];then
 	echo "Problème avec la commande de vérification du nom des tâches, si vous utilisez un client Boinc ancien, essayez la version v1.0 de suspend_calc ou mettez à jour Boinc"
 	exit 3
@@ -95,19 +95,19 @@ else
 fi
 
 #Traitements
-echo "Vérification des UT en cours... limite temps restant = $limite"
+echo -n "Vérification des UT en cours... limite % restant = " && echo "$limite * 100" | bc
 while true
 do
 	#Sélection des UT sur le point de se terminer
-	list_done=($(boinccmd --get_tasks | grep -B 12 -A 8 "suspended via GUI: no" | grep -B 2 -A 18 "$url_prj" | grep -e "fraction done:"  | grep -o '[0-9]*\.[0-9]*'))
-	list_wu=($(boinccmd --get_tasks | grep -B 12 -A 8 "suspended via GUI: no" | grep -B 2 -A 18 "$url_prj" | grep "   name: " | cut -d " " -f5))	
+	list_done=($(boinccmd --get_tasks | grep -B 12 -A 8 "suspended via GUI: no" | grep -B 2 -A 18 "$url_prj" | grep '^[[:blank:]]*fraction done:'  | grep -o '[0-9]*\.[0-9]*'))
+	list_wu=($(boinccmd --get_tasks | grep -B 12 -A 8 "suspended via GUI: no" | grep -B 2 -A 18 "$url_prj" | grep '^[[:blank:]]*name:' | cut -d " " -f5))	
 	counter=0
 	for i in "${list_done[@]}"
 	do
 		#Suspensions
 		if [[ ${list_done[$counter]} > $limite ]];then
 			#echo "${list_done[$counter]} -> ${list_wu[$counter]} -> limite = $limite"
-			echo "[`date "+%d%m%y %H:%M:%S"`] Suspension de : ${list_wu[$counter]} [Portion effectuée = ${list_done[$counter]}]"
+			echo -n "[`date "+%d%m%y %H:%M:%S"`] Suspension de : ${list_wu[$counter]} | % effectué = " && echo "${list_done[$counter]} * 100" | bc
 			cd $boincdos
 			boinccmd --task "$url_prj" ${list_wu[$counter]} suspend
 		fi
