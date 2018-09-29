@@ -19,20 +19,16 @@ if [ ! -d "$boincdos" ];then
 	exit 1
 fi
 
-testcmd=($(boinccmd --get_tasks | grep -B 12 -A 8 "suspended via GUI: no" | grep '^[[:blank:]]*fraction done:'  | grep -m 1 -o '[0-9]*\.[0-9]*'))
+testcmd=($(boinccmd --get_tasks | grep '^[[:blank:]]*fraction done:'  | grep -m 1 -o '[0-9]*\.[0-9]*'))
 if [ -z $testcmd ];then
 	echo "Problème avec la commande de vérification de la progression des tâches, si vous utilisez un client Boinc ancien, essayez la version v1.0 de suspend_calc ou mettez à jour Boinc"
 	exit 2
 fi
 
-testcmd=($(boinccmd --get_tasks | grep -B 12 -A 8 "suspended via GUI: no" | grep -m 1 '^[[:blank:]]*name:' | cut -d " " -f5))
+testcmd=($(boinccmd --get_tasks | grep -m 1 '^[[:blank:]]*name:' | cut -d " " -f5))
 if [ -z $testcmd ];then
 	echo "Problème avec la commande de vérification du nom des tâches, si vous utilisez un client Boinc ancien, essayez la version v1.0 de suspend_calc ou mettez à jour Boinc"
 	exit 3
-fi
-if [ -z $testcmd ];then
-	echo "Problème avec la commande de vérification du nom des tâches, si vous utilisez un client Boinc ancien, essayez la version v1.0 de suspend_calc ou mettez à jour Boinc"
-	exit 2
 fi
 if [ ! -f "$mydir/suspend_calc_conf" ];then
 	echo "Pas de fichier de configuration !"
