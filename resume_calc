@@ -15,7 +15,7 @@ for arg in "$@"
 do
 	if [ "$(echo $arg | grep "^http")" ];then
 		url_prj="$arg"
-	elif [ "$(echo `date -d "$arg"`)" ];then
+	elif [ "$(echo `date -d "$arg" 2> /dev/null`)" ];then
 		hms="$arg"
 	elif [ "$arg" -gt 1 -a "$arg" -le 32768 ];then
 		testpid="OK"
@@ -28,15 +28,21 @@ do
 done
 
 #Vérification si on peut bypasser les questions grâce aux arguments
-echo "$url_prj"
-echo "$hms"
-echo "$killsusp"
+echo "URL projet = $url_prj"
+echo "Date de reprise = $hms"
+echo "PID à tuer = $killsusp"
 if [ ! -z "$hms" -a ! -z "$url_prj" ];then
 	ok="OK"
 	echo "$ok"
 fi
 if [ -z "$killsusp" ];then
 	echo "-> Pas de PID, on ne tuera pas de suspend_calc !"
+else
+	testpid="$(pgrep suspend_ | grep -Fx $killsusp)"
+	if [ -z "$testpid" ];then
+		echo "PID non trouvé : mauvaise saisie, vérifier le PID passé en argument."
+		exit 1
+	fi
 fi
 
 #Choix projet
@@ -68,12 +74,16 @@ do
 			echo "$(ps -h| grep "[s]uspend_")"
 			echo "Entrer le nombre correspondant pour tuer le processus à l'heure définie : (taper ENTREE pour ne rien tuer et continuer)"
 			read killsusp
-			testpid="$(pgrep suspend_ | grep -Fx $killsusp)"
-			if [ -z "$testpid" -a ! -z "$killsusp" ];then
-				echo "Problème avec le PID : mauvaise saisie, on repart du début"
-				ok="NOK"
-				unset killsusp
-				sleep 3
+			if [ ! -z $killsusp ];then
+				testpid="$(pgrep suspend_ | grep -Fx $killsusp)"
+				if [ -z "$testpid" ];then
+					echo "Problème avec le PID : mauvaise saisie, on repart du début"
+					ok="NOK"
+					unset killsusp
+					sleep 3
+				else
+					echo "PID vérifié et OK"
+				fi
 			fi
 		fi
 	fi
@@ -114,4 +124,3 @@ do
 done < "/tmp/tasklist"
 echo "Fin script"
 exit 0
-
