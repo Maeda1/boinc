@@ -1,9 +1,9 @@
-# VERSION 1.1-alpha
+# VERSION 1.1
 US : please see at the bottom
 
 ## FR :
 
-NOTE : VERSION ALPHA, fonctionnelle mais à tester plus longtemps. La détection de l'approche de la fin d'une unité de travail est maintenant basé sur la portion effectuée 'fraction done'.
+NOTE : La détection de l'approche de la fin d'une unité de travail est maintenant basée sur la portion effectuée 'fraction done'.
 
 ### But
 Script pour Linux en Bash pour automatiser (planifier) des actions sur boinc
@@ -42,7 +42,7 @@ resume_calc url_projet "mm/jj/aaaa hh:mm" PID_de_suspend_calc
 
 ## US/EN :
 
-NOTE : ALPHA VERSION, not meant to be used in production. Will be used with last Boinc client versions, which have changed their main fields name and this script use them.
+NOTE : The suspend engine detection is now based on the "fraction done" setting from boinccmd --get_task.
 
 ### Goal 
 Script for Linux in Bash for boinc to schedule tasks (in french for now, please feel free to ask if you need that the output of script texts needs to be translated)
